@@ -9,12 +9,13 @@ from semantic_steam_search.shared import *
 
 logger = logging.getLogger(LOGGER_NAME)
 
+initialized = False
 corpus = None
 corpus_embeddings = None
 embedder = None
 
 def initialize_search():
-    global corpus, corpus_embeddings, embedder
+    global corpus, corpus_embeddings, embedder, initialized
     logger.info('Loading corpus')
     
     with open(GAMES_FILE, 'r') as f:
@@ -25,7 +26,8 @@ def initialize_search():
     with open(EMBEDDINGS_FILE, 'rb') as f:
         corpus_embeddings = pickle.load(f)
 
-    embedder = SentenceTransformer(TRANSFORMER)    
+    embedder = SentenceTransformer(TRANSFORMER)
+    initialized = True
 
 
 def search(phrase: str, offset: int, count: int) -> dict:

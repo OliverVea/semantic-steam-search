@@ -1,20 +1,26 @@
-from flask import Flask, request, jsonify
-
 from semantic_steam_search.data import initialize_data
 from semantic_steam_search.embeddings import initialize_embeddings
+from semantic_steam_search.logging import initialize_logging
 from semantic_steam_search.search import initialize_search, search
 
-initialize_data()
-initialize_embeddings()
-initialize_search()
+import threading
 
-app = Flask(__name__)
+thread = None
 
-@app.route('/search', methods=['GET'])
-def search_endpoint():
-    phrase = request.args.get('phrase', '')
-    offset = request.args.get('offset', 0, type=int)
-    count = request.args.get('count', 12, type=int)
+initialize_logging()
 
-    result = search(phrase=phrase, offset=offset, count=count)
-    return jsonify(result)
+def start_initialization():
+    global thread
+    if thread: return
+    thread = threading.Thread(target=initialization_target)
+    thread.start()
+
+def initialization_target():
+    global thread
+    initialize()
+    thread = None
+
+def initialize():
+    initialize_data()
+    initialize_embeddings()
+    initialize_search()
