@@ -2,8 +2,8 @@ import configparser
 import os
 import semantic_steam_search
 
-MODULE_ROOT = os.path.dirname(os.path.abspath(semantic_steam_search.__file__))   
-DATA_ROOT = os.path.join(MODULE_ROOT, 'data')
+MODULE_ROOT = os.path.dirname(os.path.abspath(semantic_steam_search.__file__))
+DATA_ROOT = os.environ.get('DATA_ROOT', os.path.join(MODULE_ROOT, 'data'))
 
 CONFIG_FILE = os.path.join(MODULE_ROOT, '../config.ini')
 
