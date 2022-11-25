@@ -1,9 +1,14 @@
+from semantic_steam_search.shared import *
+
 from semantic_steam_search.data import initialize_data
 from semantic_steam_search.embeddings import initialize_embeddings
 from semantic_steam_search.logging import initialize_logging
-from semantic_steam_search.search import initialize_search, search
+from semantic_steam_search.search import initialize_search
 
+import logging
 import threading
+
+logger = logging.getLogger(LOGGER_NAME)
 
 thread = None
 
@@ -21,6 +26,11 @@ def initialization_target():
     thread = None
 
 def initialize():
-    initialize_data()
-    initialize_embeddings()
-    initialize_search()
+    logger.info('Starting initialization.')
+    try:
+        initialize_data()
+        initialize_embeddings()
+        initialize_search()
+        logger.info('Finished initialization successfully!')
+    except Exception as e:
+        logger.error('Got error while initializing:\n%s', str(e))

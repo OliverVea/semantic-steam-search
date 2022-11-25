@@ -1,19 +1,17 @@
-from flask import Flask, request, jsonify
 from semantic_steam_search import start_initialization
-from semantic_steam_search.search import search, initialized
+from semantic_steam_search.search import is_initialized, search
 from semantic_steam_search.shared import clamp
+from flask import Flask, request, jsonify
 
-# Just to make super sure no nested thread spawning shenanigans happens.
-if __name__ == '__main__':
-    # Spins up a background thread for initialization.
-    # Will set semantic_steam_search.search.initialized=True when finished.
-    start_initialization() 
+# Spins up a background thread for initialization.
+# Will set semantic_steam_search.search.initialized=True when finished.
+start_initialization() 
                         
 app = Flask(__name__)
 
 @app.route('/search', methods=['GET'])
 def search_endpoint():
-    if not initialized:
+    if not is_initialized():
         return 'Search engine has not finished initialization. Please try again later.', 503
 
     phrase = request.args.get('phrase', '')
@@ -35,4 +33,4 @@ def search_endpoint():
 
 @app.route('/healthcheck')
 def healthcheck_endpoint():
-    return 200 if initialized else 500
+    return 200 if is_initialized() else 500

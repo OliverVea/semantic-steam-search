@@ -4,7 +4,7 @@ import logging
 
 from semantic_steam_search.shared import *
 
-logger = logging.getLogger('semantic_steam_search')
+logger = logging.getLogger(LOGGER_NAME)
 
 def initialize_data(kaggle_user: str | None = None, kaggle_key: str | None = None):
     if os.path.isfile(GAMES_FILE):
