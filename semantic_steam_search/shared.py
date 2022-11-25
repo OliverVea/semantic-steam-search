@@ -19,3 +19,6 @@ LOGGER_NAME = 'semantic_steam_search'
 config_parser = configparser.ConfigParser()
 config_parser.read(CONFIG_FILE)
 TRANSFORMER = config_parser.get('data', 'transformer')
+
+def clamp(minimum, value, maximum):
+    return min(max(value, minimum), maximum)

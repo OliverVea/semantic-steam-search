@@ -1,5 +1,6 @@
 import json
 import logging
+import threading
 import time
 from sentence_transformers import SentenceTransformer, util
 import torch
@@ -13,8 +14,24 @@ corpus = None
 corpus_embeddings = None
 embedder = None
 
+initialized = False
+initialized_lock = threading.Lock()
+
+def is_initialized() -> bool:
+    global initialized
+    initialized_lock.acquire()
+    result = bool(initialized)
+    initialized_lock.release()
+    return result
+
+def set_initialized(value: bool):
+    global initialized
+    initialized_lock.acquire()
+    initialized = bool(value)
+    initialized_lock.release()
+
 def initialize_search():
-    global corpus, corpus_embeddings, embedder
+    global corpus, corpus_embeddings, embedder, initialized
     logger.info('Loading corpus')
     
     with open(GAMES_FILE, 'r') as f:
@@ -25,7 +42,10 @@ def initialize_search():
     with open(EMBEDDINGS_FILE, 'rb') as f:
         corpus_embeddings = pickle.load(f)
 
-    embedder = SentenceTransformer(TRANSFORMER)    
+    logger.info('Loading embedder')
+    embedder = SentenceTransformer(TRANSFORMER)
+
+    set_initialized(True)
 
 
 def search(phrase: str, offset: int, count: int) -> dict:
