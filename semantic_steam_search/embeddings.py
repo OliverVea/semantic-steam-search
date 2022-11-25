@@ -7,6 +7,8 @@ from semantic_steam_search.shared import *
 
 logger = logging.getLogger(LOGGER_NAME)
 
+BATCH_SIZE = 16
+
 def initialize_embeddings():
     if os.path.isfile(EMBEDDINGS_FILE):
         logger.info('Found existing embeddings file. Skipping.')
@@ -28,7 +30,7 @@ def initialize_embeddings():
     corpus = [get_corpus_text(game) for game in games.values()]
 
     logger.info('Calculating embeddings. This might take some time.')
-    corpus_embeddings = embedder.encode(corpus, show_progress_bar=True, convert_to_tensor=True, batch_size=128)
+    corpus_embeddings = embedder.encode(corpus, show_progress_bar=True, convert_to_tensor=True, batch_size=BATCH_SIZE)
     
     logger.info('Saving embeddings to \'%s\'.', EMBEDDINGS_FILENAME)
     with open(EMBEDDINGS_FILE, 'wb') as f:
