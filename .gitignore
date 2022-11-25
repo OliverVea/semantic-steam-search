@@ -1,0 +1,4 @@
+**/*.pickle
+**/*.json
+.vscode
+**/__pycache__
