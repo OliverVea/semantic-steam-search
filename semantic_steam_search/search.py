@@ -1,3 +1,4 @@
+import dataclasses
 import json
 import logging
 import threading
@@ -17,6 +18,12 @@ embedder = None
 initialized = False
 initialized_lock = threading.Lock()
 
+@dataclasses.dataclass
+class SearchRequest:
+    phrase: str
+    offset: int = 0
+    results: int = 12    
+    
 def is_initialized() -> bool:
     global initialized
     initialized_lock.acquire()
@@ -48,25 +55,35 @@ def initialize_search():
     set_initialized(True)
 
 
-def search(phrase: str, offset: int, count: int) -> dict:
+def search(request: SearchRequest) -> dict:
     start = time.time()
-    logger.info(f'Getting search results for phrase \'{phrase}\'.')
+    logger.info(f'Getting search results for phrase \'{request.phrase}\'.')
 
     logger.info('Calculating query embedding')
-    query_embedding = embedder.encode(phrase, convert_to_tensor=True)
+    query_embedding = embedder.encode(request.phrase, convert_to_tensor=True)
 
     logger.info('Calculating cosine similarity.')
     cos_scores = util.cos_sim(query_embedding, corpus_embeddings)[0]
 
-    logger.info(f'Finding top {count} results with offset {offset}.')
-    scores, indices = torch.topk(cos_scores, k=(count + offset))
-    scores, indices = scores[offset:], indices[offset:]
+    logger.info(f'Finding top {request.results} results with offset {request.offset}.')
+    scores, indices = torch.topk(cos_scores, k=(request.results + request.offset))
+    scores, indices = scores[request.offset:], indices[request.offset:]
 
     duration_ms = (time.time()-start) * 1000
     logger.info(f'Finished search request in {duration_ms:.1f}ms.')
 
+    hits = [corpus[i] for i in indices]
+
+    for hit in hits: 
+        hit['release_year'] = hit['release_date'][:4]
+        hit['steam_link'] = f'https://store.steampowered.com/app/{hit["appid"]}/'
+        hit['short_description'] = hit['short_description'].replace('&quot;', '"')
+        hit['short_description'] = hit['short_description'].replace('&amp;', '&')
+        #if len(hit['short_description']) > 300: hit['short_description'] = hit['short_description'][:300] + '...'
+
     return {
-        'hits': [corpus[i] for i in indices],
+        'hits': hits,
         'current': len(indices),
         'total': len(corpus)
     }
+
