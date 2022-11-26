@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>Semantic Steam Search</title>
+</head>
+
+<body>
+    <div id="page-container">
+    <div id="content">
+        <div id="search-area">
+            <form action="{{url}}" method="GET">
+                <input type="search" id="search-bar" name="phrase" value="{{phrase}}" />
+              </form>
+        </div>
+        <div id="results-area">
+            <div class="card-grid">
+                {% for product in products %}
+                <a href={{product['steam_link']}}>
+                <div class="card-container">
+                    <div class="card-content">
+                        <p class="card-title">{{product['name']}}</p>
+                        <p class="card-subtitle">{{product['developer']}}, {{product['release_year']}}</p>
+                        <p class="card-description">{{product['short_description']}}</p>
+                    </div>
+                    <img class="card-image" src={{product['header_image']}}>
+                </div>
+                </a>
+                {% endfor %}
+            </div>
+            <div class="navigation-menu">
+                <div>{% if include_previous %}<p><a href="{{previous_link}}"><</a></p> {% endif %}</div>
+                <div><p>{{current_page}}</p></div>
+                <div><p><a href="{{next_link}}">></a></p></div>
+            </div>
+        </div>
+    
+    </div>
+    <div id="footer">
+        <p>This site is not affiliated with Valve in any way.</p>
+    </div>
+</div>
+</body>
+
+</html>

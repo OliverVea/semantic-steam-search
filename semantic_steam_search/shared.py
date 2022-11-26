@@ -2,6 +2,8 @@ import configparser
 import os
 import semantic_steam_search
 
+BASE_URL = os.environ.get('BASE_URL', 'http://127.0.0.1:5000/')
+
 MODULE_ROOT = os.path.dirname(os.path.abspath(semantic_steam_search.__file__))
 DATA_ROOT = os.environ.get('DATA_ROOT', os.path.join(MODULE_ROOT, 'data'))
 
